@@ -1,1 +1,24 @@
-// TODO
+.posts {
+    padding: 3rem 0;
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        color: var(--gray-50);
+        transition: color 0.2s;
+        &:hover {
+            color: var(--pink);
+        }
+    }
+
+    p {
+        font-size: 1.125rem;
+        margin-bottom: 1rem;
+        color: var(--gray-200);
+    }
+
+    a {
+        display: block;
+        margin-bottom: 3rem;
+    }
+
+}
