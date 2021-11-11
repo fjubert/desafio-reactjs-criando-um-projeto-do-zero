@@ -1,1 +1,28 @@
-// TODO
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.postMeta {
+    display: inline-flex;
+    align-items: center;
+
+    span, time, svg {
+        color: var(--gray-300);
+    }
+
+    span, time {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin-left: 0.35rem;
+    }
+
+    svg {
+        font-size: 1.25rem;
+    }
+
+    & + .postMeta {
+        margin-left: 1.5rem;
+    }
+}
