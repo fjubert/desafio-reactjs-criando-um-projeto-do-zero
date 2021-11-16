@@ -1,13 +1,10 @@
+import { useState } from 'react';
 import { GetStaticProps } from 'next';
 import Prismic from '@prismicio/client';
 import Head from 'next/head';
-import Link from 'next/link';
-
-import { FiUser, FiCalendar } from 'react-icons/fi';
-
-import { format } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
+import PostsList from '../components/PostsList';
+import LoadMoreButton from '../components/LoadMoreButton';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
@@ -33,6 +30,30 @@ interface HomeProps {
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
   const { results } = postsPagination;
+  const { next_page } = postsPagination;
+  const [nextPage, setNextPage] = useState(next_page);
+  const [postsList, setPostsList] = useState<Post[]>(results);
+
+  const handleLoadMorePosts = async (): Promise<void> => {
+    await fetch(nextPage)
+      .then(response => response.json())
+      .then(data => {
+        const postsData = data.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: post.first_publication_date,
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            },
+          };
+        });
+        setPostsList([...postsList, ...postsData]);
+        setNextPage(data.next_page);
+      });
+  };
+
   return (
     <>
       <Head>
@@ -41,22 +62,12 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
       <main className={commonStyles.container}>
         <div className={styles.posts}>
-          {results.map(post => (
-            <Link href={`/posts/${post.uid}`} key={post.uid}>
-              <a>
-                <h1>{post.data.title}</h1>
-                <p>{post.data.subtitle}</p>
-                <div className={commonStyles.postMeta}>
-                  <FiCalendar />
-                  <time>{post.first_publication_date}</time>
-                </div>
-                <div className={commonStyles.postMeta}>
-                  <FiUser />
-                  <span>{post.data.author}</span>
-                </div>
-              </a>
-            </Link>
-          ))}
+          <PostsList posts={postsList} />
+          {nextPage !== null ? (
+            <LoadMoreButton handleLoadMorePosts={handleLoadMorePosts} />
+          ) : (
+            ''
+          )}
         </div>
       </main>
     </>
@@ -73,17 +84,10 @@ export const getStaticProps: GetStaticProps = async () => {
       pageSize: 3,
     }
   );
-  // eslint-disable-next-line no-console
   const results = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'd MMM yyyy',
-        {
-          locale: ptBR,
-        }
-      ),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,

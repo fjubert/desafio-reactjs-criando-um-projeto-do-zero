@@ -20,5 +20,18 @@
         display: block;
         margin-bottom: 3rem;
     }
+    
+    button {
+        padding: 5px 0;
+        background: none;
+        border: none;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--pink);
+        transition: filter 0.2s;
+        &:hover {
+            filter: brightness(0.8);
+        }
+    }
 
 }
